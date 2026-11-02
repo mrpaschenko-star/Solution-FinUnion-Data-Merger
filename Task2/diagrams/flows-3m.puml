@@ -1,0 +1,61 @@
+@startuml
+!pragma layout smetana
+left to right direction
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 13
+skinparam nodesep 30
+skinparam ranksep 50
+title FinUnion — потоки через 3 месяца (развёрнутый ландшафт)
+package "Операционные источники / финансовые masters" {
+  rectangle "FU CRM" as fucrm #DCEBFA
+  rectangle "RB CRM" as rbcrm #DCEBFA
+  rectangle "FU Core" as fucore #DCEBFA
+  rectangle "RB Core" as rbcore #DCEBFA
+  rectangle "FU Cards" as fucards #DCEBFA
+  rectangle "RB Cards" as rbcards #DCEBFA
+  rectangle "FU Loans" as fuloans #DCEBFA
+  rectangle "RB Loans" as rbloans #DCEBFA
+}
+rectangle "Integration Layer\nFU ESB + RB adapters\nValidate / inbox / checkpoints" as integration #FFF1D6
+database "MDM Customer Hub (MVP)\nPostgreSQL registry\nMatch / Enrich / Create / Update" as hub #E5F1DF
+rectangle "Privacy / domain owner" as privacy #FFE4DC
+database "Legacy: FU DWH / RB DWH\nчастичный FU Lake" as old #EEEEEE
+database "PostgreSQL DWH\nstaging → dbt → 4 marts\nValidate / Aggregate / release" as dwh #E5F1DF
+rectangle "FU BI + RB BI\nобщие метрики / release ID" as bi #DCEBFA
+rectangle "DataHub\nmetadata / owners / lineage" as catalog #E5F1DF
+rectangle "Finance export → Регулятор\napproval перед отправкой" as reg #DCEBFA
+fucrm --> integration : F01: Create / Update
+rbcrm --> integration : F01: Create / Update
+fucore --> integration : F02: Read / Validate
+rbcore --> integration : F02: Read / Validate
+fucards --> integration : F03: Read / Validate
+rbcards --> integration : F03: Read / Validate
+fuloans --> integration : F04: Read / Validate
+rbloans --> integration : F04: Read / Validate
+integration --> hub : F05: Validate / Enrich
+hub --> integration : F06: IDs / approved attributes
+integration ..> fucrm : F06: Update / Enrich
+integration ..> rbcrm : F06: Update / Enrich
+integration --> dwh : F07: Read / Create\nbatch / CDC landing
+hub --> dwh : F08: fixed dimensions\nRead / Enrich
+old --> integration : F09: history / controls\nRead / Validate
+dwh --> bi : F10: Read / Aggregate
+dwh --> reg : F13: Read / Validate\ncertified export
+privacy --> integration : F12: approved\nDelete / restrict
+integration ..> hub : F12: policy + evidence
+integration ..> dwh : F12: policy + evidence
+dwh ..> bi : F12: restriction / cache purge
+integration ..> catalog : F11: source / run metadata
+hub ..> catalog : F11: mappings
+dwh ..> catalog : F11: lineage / DQ
+bi ..> catalog : F11: dataset / metrics
+legend bottom
+  F06 в Core/Cards/Loans: только разрешённые ID/справочники;
+  обратные стрелки к этим шести системам опущены для читаемости.
+  Delete — только разрешённые объекты; posted ledger не удаляется.
+  F09 backfill ограничен непересекающимся source/date scope.
+  F11 передаёт метаданные; каталог не получает копию ПДн.
+  Это раскрытие систем; строгий context DFD — context-zero.puml.
+endlegend
+@enduml

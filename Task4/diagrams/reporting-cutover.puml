@@ -1,0 +1,53 @@
+@startuml
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 13
+skinparam sequenceMessageAlign center
+title FinUnion — cutover управленческой отчётности
+actor "Release manager\n+ Operations" as rm
+participant "Sources / Hub\nCore пишет постоянно" as src
+participant "Legacy control\nFU/RB DWH" as old
+participant "Airflow / dbt\n+ DWH" as dwh
+actor "Finance\nmaker / checker" as fin
+participant "FU BI / RB BI\nи экспорты" as bi
+rm -> dwh : Проверить restore, contracts, DQ, consumers
+rm -> old : Подготовить consolidated fallback\nна тот же cutoff / definitions
+old -> fin : Контрольный bundle + manifest
+fin --> rm : Fallback accepted
+rm -> dwh : Freeze SQL / metric / config versions
+rm -> src : Зафиксировать Hub / FX snapshots\nsource close markers + vector positions
+note over src
+  Freeze касается отчётных версий.
+  OLTP и master updates продолжаются.
+end note
+src -> dwh : Final committed delta / exports\nmanifest, totals, pinned mappings
+dwh -> dwh : Stage → dedup → 4 candidate marts
+dwh -> fin : Технические + финансовые сверки\nпо книге / дате / валюте / источнику
+fin -> fin : Maker проверяет, checker принимает
+alt Hard gate не пройден
+  fin --> rm : NO-GO / reason
+  rm -> bi : Сохранить accepted version\nвидимая дата / incident
+else Hard gates пройдены
+  fin --> rm : Approvals / GO
+  rm -> dwh : Atomic published_release pointer
+  dwh -> bi : Accepted manifest / release ID
+  bi -> bi : Pin datasets, очистить caches\nпроверить exports и permissions
+  bi --> rm : Probes / release IDs / totals
+  loop Согласованное окно наблюдения
+    dwh --> rm : Freshness / DQ / reconciliation
+    bi --> rm : Latency / errors / version consistency
+  end
+  opt Денежное расхождение / доступ / freshness failure
+    rm -> dwh : Остановить publish, сохранить evidence
+    rm -> fin : Выбрать accepted fallback version
+    fin --> rm : Bundle того же cutoff\nили явно устаревший accepted release
+    rm -> bi : Вернуть route / dataset version\nпроверить caches / exports
+    bi --> rm : Fallback probes + release ID
+    rm -> dwh : Исправить, новый release, повторить gates
+  end
+end
+note over rm, bi
+  Никакого rollback банковских транзакций.
+  Legacy отключается только после отдельной приёмки.
+end note
+@enduml

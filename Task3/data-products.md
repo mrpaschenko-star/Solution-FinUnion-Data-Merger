@@ -1,0 +1,15 @@
+# Доменные data-продукты
+
+Применяются элементы Data Mesh: доменный владелец отвечает за смысл и контракт, общая команда платформы — за механизмы доставки/каталога/доступа. Набор таблиц становится продуктом после назначения owner, schema/semantic contract, SLO, lineage, правил доступа и support route.
+
+| Data product | Домен / BIAN | Основные данные и grain | Владелец | Потребители | Контракт качества/доступа |
+|---|---|---|---|---|---|
+| DP01 Customer 360 | Party Reference Data Directory | Golden customer, source aliases, segments, ссылки на продукты/договоры/кейсы; профиль не содержит writable balances | Party/KYC owner; Data Office steward | CRM/менеджеры, риск, разрешённый маркетинг | Versioned mapping и quality status; protected attribute views, consent purpose, спорные matches явно unresolved |
+| DP02 Account Position | Current Account + accounting aspects | Счёт × дата/книга/валюта/release; balances и договорные роли | Счётный бизнес + Finance | Finance/BI, менеджеры через разрешённую projection | Closing reconciliation, distinction available/ledger; доступ по роли/юрлицу, balance не realtime promise |
+| DP03 Payments & Postings | Payment Execution / Financial Accounting | Separate instructions/executions и ledger entries с correlation, без смешения grains | Payments + Finance | Регуляторный процесс, Finance, operations/risk | Unique source facts, no double count, signed release; restricted financial fields и immutable corrections |
+| DP04 Cards Activity | Issued Device Administration для карты; событийные карточные аспекты уточняются отдельно | Tokenized card lifecycle и authorisation/clearing/settlement events, link to ledger | Карточный бизнес | Fraud/research, карточный BI, customer service | Versioned status mapping, event type, no PAN/CVV; event freshness и historical coverage явно объявлены |
+| DP05 Credit Portfolio | Consumer Loan для retail, бизнес-домен Loans для остальных | Кредит × дата/условия/график; principal/interest/fees отдельно, связь с договором/учётом | Кредитный бизнес + риск | Риск, Finance, управленческий BI | Schedule/ledger reconciliation, product applicability, late corrections; sensitive financial access |
+
+Для каждого продукта DataHub содержит definition, examples на синтетических данных, owner/steward, source lineage, schema compatibility, source freshness и даты покрытия. Предлагаемые цели на три месяца берутся из [таблицы потоков](../Task2/data-flow-management.md); сквозные продуктовые SLO должны учитывать сумму этапов и ручные проверки. Регуляторная публикация требует Finance approval независимо от статуса freshness.
+
+Правила федерации: общий enterprise ID и semantic glossary, обязательные legal entity/book/currency keys, единые privacy классы, contract review для breaking changes и единый каталог. Domain owners не выбирают несовместимые определения «клиента»/«оборота» без явного нового показателя. Platform team предоставляет шаблон pipeline, quality gates, deployment/restore и observability, а не решает бизнес-семантику за владельцев.
