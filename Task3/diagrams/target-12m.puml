@@ -1,0 +1,61 @@
+@startuml
+!pragma layout smetana
+top to bottom direction
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 13
+skinparam nodesep 35
+skinparam ranksep 45
+title FinUnion — целевая архитектура данных, 12 месяцев
+package "OLTP: единственный owner по объекту" {
+  rectangle "Target CRM / Core / Cards / Loans\nFU — кандидаты после проверки\nRB residual cohorts по реестру" as ops #DCEBFA
+  database "Профильные operational stores\nсчета / договоры / ledger" as oltp #DCEBFA
+  ops --> oltp : локальные транзакции
+}
+rectangle "Integration Layer\nESB / adapters / capture\nversioned APIs / contracts" as integration #FFF1D6
+database "MDM\nParty / crosswalk\nproduct / reference" as mdm #E5F1DF
+queue "Kafka + Schema Registry\nAvro / replay / consumer groups" as kafka #FFF1D6
+folder "Object landing / archive\nsource manifests / encrypted inputs" as landing #FFF1D6
+package "OLAP: независимые ресурсы и доступ" {
+  rectangle "Airflow + dbt\nbatch / SQL / tests" as elt #E5F1DF
+  database "PostgreSQL DWH\nconformed facts / dimensions\ncertified releases" as dwh #E5F1DF
+  rectangle "Spark\nhistory / stream jobs" as spark #E5F1DF
+  database "Iceberg Lakehouse\nParquet / object store\nbronze / silver / curated" as lake #E5F1DF
+  database "Iceberg transactional catalog\ntable pointers / commits" as icecatalog #E5F1DF
+  rectangle "Trino\nSQL по Lakehouse" as trino #E5F1DF
+}
+rectangle "BI / semantic layer\nFinance / management" as bi #DCEBFA
+rectangle "Finance approved export\n→ регулятор" as reg #DCEBFA
+rectangle "Risk / аналитики\nразрешённые datasets" as risk #DCEBFA
+rectangle "DataHub\nowners / glossary / DQ\ncolumn + run lineage" as datahub #EEE4F7
+ops --> integration : supported CDC / export / API
+integration --> mdm : identity / reference inputs
+mdm --> integration : approved master versions
+integration ..> ops : ID / разрешённые атрибуты
+integration --> kafka : committed changes / events
+integration --> landing : MVP batch / manifests
+kafka --> landing : durable sink / checkpoints
+landing --> elt : закрытые inputs
+mdm --> elt : pinned mapping / dimensions
+elt --> dwh : P02 / P05 / P06
+landing --> spark : P03 backfill
+kafka --> spark : P04 events
+spark --> lake : dedup / transform / commit
+spark --> icecatalog : atomic table commit
+trino --> icecatalog : resolve snapshots
+trino --> lake : read snapshots
+lake --> elt : curated history / aggregates\nnon-overlapping scope
+dwh --> bi : accepted release
+dwh --> reg : certified facts / approval
+trino --> risk : controlled SQL results
+elt ..> datahub : run / lineage / DQ
+spark ..> datahub : source / output snapshots
+integration ..> datahub : schemas / owners
+legend bottom
+  DataHub — governance, не transactional catalog Iceberg.
+  Airflow оркестрирует batch; отдельные jobs исполняют stream.
+  BI/Trino не выполняют аналитические запросы в live OLTP.
+  История, идентичность и finance facts имеют отдельных owners.
+  Все технологии требуют пилота, ИБ и эксплуатационной приёмки.
+endlegend
+@enduml

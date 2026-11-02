@@ -1,0 +1,40 @@
+@startuml
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam activityBackgroundColor #E5F1DF
+title FinUnion — восемь этапов перехода (проектные интервалы)
+start
+:1. М1 — Discovery\nисточники, владельцы, capability, объёмы;
+:2. М1–М2 — Модель и authority\nE01–E15, BIAN, метрики, KYC, cutoff;
+fork
+  :3. М2–М3 — Hub / adapters\nsource IDs, matching, snapshot + delta;
+fork again
+  :4. М2–М3 — PostgreSQL DWH\n4 marts, Airflow/dbt, DQ, DataHub;
+end fork
+:5. К концу М3 — Shadow / сверка\nрепетиция fallback и approvals;
+if (Все hard gates пройдены?) then (да)
+  :Cutover общей отчётности\naccepted release в обоих BI;
+else (нет)
+  :Контрольная версия + эскалация\nисправление и повторная приёмка;
+  stop
+endif
+fork
+  :6. М4–М8 — История и события\nKafka, Iceberg, Spark/Trino\nпилоты → эксплуатационная приёмка;
+fork again
+  :7. М6–М10 — Data products / consumers\nDP01–DP05, CRM, оценка financial cohorts;
+end fork
+:8. М9–М12 — Приёмка / legacy gates\nrestore архива, ownership, handover;
+if (Все consumers и функции заменены?) then (для системы — да)
+  :Отключить согласованную legacy-систему\nсохранить разрешённый архив;
+else (нет)
+  :Residual owner / бюджет / новый milestone\nRB Core/Cards/Loans могут оставаться;
+endif
+:Единая модель + MDM + DWH/Lakehouse\nlineage, управление и план остаточных переносов;
+stop
+legend bottom
+  Параллельные работы имеют отдельные команды / capacity gate.
+  Финансовое мастерство не переключается вместе с BI.
+  Ни дата, ни успешный demo не заменяют критерии приёмки.
+endlegend
+@enduml

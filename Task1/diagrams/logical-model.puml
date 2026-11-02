@@ -1,0 +1,103 @@
+@startuml
+!pragma layout smetana
+hide circle
+hide methods
+skinparam linetype ortho
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 13
+skinparam classAttributeIconSize 0
+skinparam nodesep 30
+skinparam ranksep 45
+title FinUnion — логическая модель E01–E15
+entity "E01 Customer / Party" as customer #DCEBFA {
+  customer_id
+  party_type; quality_status
+}
+entity "E02 Identifier / Crosswalk" as crosswalk #DCEBFA {
+  source_system; local_id
+  legal_entity_id; customer_id
+  valid_from/to; mapping_version
+}
+entity "E13 Consent" as consent #DCEBFA {
+  consent_id; purpose; evidence
+  effective_from/to; status
+}
+entity "E11 Service Case" as support #DCEBFA {
+  case_id; source; status
+  created_at; subject
+}
+entity "E14 AgreementParty" as party #DCEBFA {
+  agreement_id; customer_id
+  role; valid_from/to; evidence
+}
+entity "E06 Agreement" as agreement #FFF1D6 {
+  agreement_id; source; legal_entity
+  product_version; effective_dates
+}
+entity "E10 Product" as product #E5F1DF {
+  product_id; version; class
+  tariff; effective_from/to
+}
+entity "E12 Reference Value" as ref #E5F1DF {
+  dictionary; code; version
+  valid_from/to
+}
+entity "E03 Account" as account #FFF1D6 {
+  account_id; source; agreement_id
+  legal_entity; book; currency
+}
+entity "E04 Card" as card #FFF1D6 {
+  card_token; source; account_id
+  holder_customer_id; status
+}
+entity "E05 Loan" as loan #FFF1D6 {
+  loan_id; source; agreement_id
+  principal; schedule; currency
+}
+entity "E09 Payment Instruction" as payment #FFE4DC {
+  payment_id; source; status
+  amount_decimal; currency
+}
+entity "E07 Accounting Transaction" as txn #FFE4DC {
+  transaction_id; source; book
+  business_date; reversal_ref
+}
+entity "E08 Ledger Entry" as entry #FFE4DC {
+  entry_id; transaction_id; account_id
+  amount_decimal; debit_credit
+  currency; source_version
+}
+entity "E15 FXRate" as fx #E5F1DF {
+  rate_date; pair; type; provider
+  rate_decimal; version
+}
+customer "1" -- "0..*" crosswalk
+customer "1" -- "0..*" consent
+customer "1" -- "0..*" support
+customer "1" -- "0..*" party
+agreement "1" -- "1..*" party
+agreement "0..1" -- "0..*" support
+product "1" -- "0..*" agreement : version
+agreement "1" -- "0..*" account
+agreement "1" -- "0..1" loan : кредитный
+account "0..1" -- "0..*" loan : repayment account
+account "1" -- "0..*" card
+product "1" -- "0..*" card : version
+customer "1" -- "0..*" card : держатель
+payment "0..1" -- "0..*" txn : исполнение / комиссии
+txn "1" -- "2..*" entry : posted legs
+account "1" -- "0..*" entry
+account "0..1" -- "0..*" payment : счёт списания
+account "0..1" -- "0..*" payment : счёт зачисления
+fx "0..1" .. "0..*" entry : reporting conversion
+ref .. product : классификация
+ref .. account : валюта / тип
+legend bottom
+  Логические связи; межсистемные FK не предлагаются.
+  Source keys всегда включают namespace и legal_entity.
+  Внешний счёт платежа может не иметь локального Account.
+  FX не заменяет исходную сумму; refs других сущностей опущены.
+  Подробные инварианты: ../logical-data-model.md
+endlegend
+@enduml

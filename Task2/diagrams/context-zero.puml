@@ -1,0 +1,28 @@
+@startuml
+!pragma layout smetana
+left to right direction
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+title FinUnion — DFD уровня 0: контекст объединённого контура данных
+rectangle "Клиенты и каналы\nFU / RetailBank" as clients #DCEBFA
+rectangle "Сотрудники банка\nCRM / обслуживание" as staff #DCEBFA
+rectangle "Finance / менеджмент\nпотребители отчётности" as finance #DCEBFA
+rectangle "Data Owners / Stewards\nИБ / Legal" as owners #DCEBFA
+rectangle "Регулятор" as regulator #FFF1D6
+usecase "0. Объединённый контур данных\nFinUnion + RetailBank\n\nОперационные системы, Hub,\nинтеграция, DWH и BI" as system #E5F1DF
+clients --> system : Данные клиента, согласия,\nплатёжные инструкции
+system --> clients : Статусы / разрешённый профиль
+staff --> system : Изменения и обращения
+system --> staff : Согласованный профиль / кейсы
+owners --> system : Политики / решения качества
+system --> owners : DQ / lineage / исключения
+system --> finance : Общие отчёты / контрольные итоги
+finance --> system : Определения / approval
+system --> regulator : F13: утверждённые выгрузки\nчерез процесс Finance
+legend bottom
+  Один процесс и внешние участники — строгий context DFD.
+  Внутренние системы и F01–F13 раскрыты на flows-3m.puml.
+  Показаны данные, а не порядок исполнения операций.
+endlegend
+@enduml

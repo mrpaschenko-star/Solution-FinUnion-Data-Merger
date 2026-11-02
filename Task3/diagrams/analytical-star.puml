@@ -1,0 +1,77 @@
+@startuml
+!pragma layout smetana
+hide circle
+hide methods
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 13
+skinparam classAttributeIconSize 0
+skinparam nodesep 35
+skinparam ranksep 40
+title FinUnion — звезда финансовых движений
+entity "fact_ledger_entry" as entry #FFF1D6 {
+  entry_sk; source key / version
+  account_sk; product_sk
+  legal_entity_sk; currency_sk; date_sk
+  fx_rate_sk [optional]; release_id
+  --
+  amount_decimal; debit_credit
+  source_transaction_id / payment_id
+}
+entity "fact_account_daily" as balance #FFF1D6 {
+  account_sk; date_sk; currency_sk
+  legal_entity_sk; product_sk; release_id
+  --
+  opening / closing balance
+  debit / credit turnover
+}
+entity "dim_account (SCD2)" as account #DCEBFA {
+  account_sk; source_account_id
+  valid_from/to; type; status
+}
+entity "dim_product (SCD2)" as product #DCEBFA {
+  product_sk; tariff_version
+  valid_from/to; class
+}
+entity "dim_legal_entity" as legal #DCEBFA {
+  legal_entity_sk; entity_id; book
+}
+entity "dim_currency" as currency #DCEBFA {
+  currency_sk; code; precision
+}
+entity "dim_date" as date #DCEBFA {
+  date_sk; business_date; period
+}
+entity "dim_fx_rate" as fx #DCEBFA {
+  fx_rate_sk; pair; rate_date
+  rate_type; provider; version
+}
+entity "bridge_account_party" as bridge #EEE4F7 {
+  account_sk; customer_sk; role
+  valid_from/to; mapping_version
+}
+entity "dim_customer" as customer #DCEBFA {
+  customer_sk; enterprise_id
+  profile_version; provisional
+}
+entry }o--|| account
+entry }o--|| product
+entry }o--|| legal
+entry }o--|| currency
+entry }o--|| date
+entry }o--o| fx
+balance }o--|| account
+balance }o--|| product
+balance }o--|| legal
+balance }o--|| currency
+balance }o--|| date
+account ||--o{ bridge
+customer ||--o{ bridge
+legend bottom
+  Grain entry: одна posted проводка (не платёж целиком).
+  Grain daily: счёт × день × валюта × книга × release.
+  Остатки не аддитивны по времени; валюты требуют conversion.
+  Bridge M:N: агрегация до join или утверждённая allocation policy.
+  Все facts/dimensions закреплены за принятой версией отчёта.
+endlegend
+@enduml

@@ -1,0 +1,66 @@
+{
+  "release": "12.0.0",
+  "purpose": "Fixed reference baseline, not latest release or conformance claim",
+  "domains": [
+    {
+      "domain": "PartyReferenceDataDirectory",
+      "url": "https://raw.githubusercontent.com/bian-official/public/main/release12.0.0/semantic-apis/oas3/yamls/PartyReferenceDataDirectory.yaml",
+      "sha256": "2fca6ce876a908fa7694d561898ed78cdb46456ecde3a9b6c3e40beb7f7b260d",
+      "header": "openapi: 3.0.1\ninfo:\n  title: Party Reference Data Directory\n  description: 'This service domain maintains a range of party reference information covering aspects including general reference details, contacts and associations and demographic information'\n  contact:\n    name: BIAN\n    url: https://bian.org\n  version: 12.0.0\n"
+    },
+    {
+      "domain": "CurrentAccount",
+      "url": "https://raw.githubusercontent.com/bian-official/public/main/release12.0.0/semantic-apis/oas3/yamls/CurrentAccount.yaml",
+      "sha256": "12cef4d8e71737a81adb4b349b158c38b0c868344a51060fe90fce55aabf7cb5",
+      "header": "openapi: 3.0.1\ninfo:\n  title: Current Account\n  description: 'This service domain orchestrates a consumer checking/demand deposit account. The typical range of services and fees covers payments and deposits, standing orders, sweeps, liens, check and debit card access.'\n  contact:\n    name: BIAN\n    url: https://bian.org\n  version: 12.0.0\n"
+    },
+    {
+      "domain": "IssuedDeviceAdministration",
+      "url": "https://raw.githubusercontent.com/bian-official/public/main/release12.0.0/semantic-apis/oas3/yamls/IssuedDeviceAdministration.yaml",
+      "sha256": "c1ee9e913eb968ffeb46d6bfc0d4df2a2bd0e26d217c3a300dadcfd0ccd70eee",
+      "header": "openapi: 3.0.1\ninfo:\n  title: Issued Device Administration\n  description: 'This service domain administers the issuance of authentication tokens to customers and third party service providers. Tokens here include physical devices such as cards, fobs, readers and intangible ''devices'' such as passwords and secret questions. Administration includes version tracking, replacement and duration/frequency limits. Specific product/service access permissions may be associated with an issued token when appropriate'\n  contact:\n    name: BIAN\n    url: https://bian.org\n  version: 12.0.0\n"
+    },
+    {
+      "domain": "ConsumerLoan",
+      "url": "https://raw.githubusercontent.com/bian-official/public/main/release12.0.0/semantic-apis/oas3/yamls/ConsumerLoan.yaml",
+      "sha256": "120a44594bb0c5031cfd732c7058a954a190a6cf3b9e58c142b66b14f1a4ad07",
+      "header": "openapi: 3.0.1\ninfo:\n  title: Consumer Loan\n  description: This service domain handles the fulfillment of a consumer loan product. This includes the initial set-up of the loan facility and the completion of scheduled and ad-hoc product processing tasks\n  contact:\n    name: BIAN\n    url: https://bian.org\n  version: 12.0.0\n"
+    },
+    {
+      "domain": "CustomerAgreement",
+      "url": "https://raw.githubusercontent.com/bian-official/public/main/release12.0.0/semantic-apis/oas3/yamls/CustomerAgreement.yaml",
+      "sha256": "5c5b8386056c7ae368428a25fc4b40a2810ab2792c379031c7560ad3532f36b4",
+      "header": "openapi: 3.0.1\ninfo:\n  title: Customer Agreement\n  description: This service domain maintains the master customer agreement/legal contract. Note that a customer can be a complex corporate entity with many subsidiaries operating in different geopolitical areas. The customer agreement is linked to as many Sales Product Agreements as needed for all in-force products\n  contact:\n    name: BIAN\n    url: https://bian.org\n  version: 12.0.0\n"
+    },
+    {
+      "domain": "FinancialAccounting",
+      "url": "https://raw.githubusercontent.com/bian-official/public/main/release12.0.0/semantic-apis/oas3/yamls/FinancialAccounting.yaml",
+      "sha256": "f32409dce2ffacf7309814d32e6b09624b79599af6aa9ad1af3f1117763e6c54",
+      "header": "openapi: 3.0.1\ninfo:\n  title: Financial Accounting\n  description: 'The Financial Accounting Service Domain takes in financial facts and based on these, creates accounting instructions that will update the general ledger and sub ledger accounts'\n  contact:\n    name: BIAN\n    url: https://bian.org\n  version: 12.0.0\n"
+    },
+    {
+      "domain": "PaymentExecution",
+      "url": "https://raw.githubusercontent.com/bian-official/public/main/release12.0.0/semantic-apis/oas3/yamls/PaymentExecution.yaml",
+      "sha256": "a3fdda06b18af7be1c99c7e8c73b08d07e96aa628a946898bb70e10892cd6714",
+      "header": "openapi: 3.0.1\ninfo:\n  title: Payment Execution\n  description: 'This service domains processes the movement of funds between accounts within the bank or to/from an account held with another bank, selecting the appropriate payment mechanism'\n  contact:\n    name: BIAN\n    url: https://bian.org\n  version: 12.0.0\n"
+    },
+    {
+      "domain": "ProductDirectory",
+      "url": "https://raw.githubusercontent.com/bian-official/public/main/release12.0.0/semantic-apis/oas3/yamls/ProductDirectory.yaml",
+      "sha256": "558726a3a6da8093c2ed35123c039282579f6e279921ef422f2f403b2a725abe",
+      "header": "openapi: 3.0.1\ninfo:\n  title: Product Directory\n  description: 'This service domain maintains a comprehensive directory of the bank''s products and services. It can be referenced to obtain product details used to support activities including product selection, sales and marketing, on-boarding, servicing and product fulfillment.'\n  contact:\n    name: BIAN\n    url: https://bian.org\n  version: 12.0.0\n"
+    },
+    {
+      "domain": "CustomerCaseManagement",
+      "url": "https://raw.githubusercontent.com/bian-official/public/main/release12.0.0/semantic-apis/oas3/yamls/CustomerCaseManagement.yaml",
+      "sha256": "380aef40626fe9d37c6a527d45d58d7bd4df0bdfcb4e5abd54356eeabdf225ce",
+      "header": "openapi: 3.0.1\ninfo:\n  title: Customer Case Management\n  description: Track and assess case load and resolution activity - allocate resources as necessary to optimize case resolution performance\n  contact:\n    name: BIAN\n    url: https://bian.org\n  version: 12.0.0\n"
+    },
+    {
+      "domain": "PublicReferenceDataManagement",
+      "url": "https://raw.githubusercontent.com/bian-official/public/main/release12.0.0/semantic-apis/oas3/yamls/PublicReferenceDataManagement.yaml",
+      "sha256": "74c218b7903b899f03fc61894c1a8bb6004b5fff80cd9298954327e9823262c5",
+      "header": "openapi: 3.0.1\ninfo:\n  title: Public Reference Data Management\n  description: 'Provide structured access to standard ''global'' reference data and definitions associated with market activity such as currency, country and segment identifiers.'\n  contact:\n    name: BIAN\n    url: https://bian.org\n  version: 12.0.0\n"
+    }
+  ]
+}
